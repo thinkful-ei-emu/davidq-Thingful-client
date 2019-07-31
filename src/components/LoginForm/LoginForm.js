@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Input } from '../Utils/Utils'
 import ts from '../../services/token-service';
+import config from '../../config';
+let endpoint = config.API_ENDPOINT; 
 
 export default class LoginForm extends Component {
   static defaultProps = {
@@ -14,13 +16,26 @@ export default class LoginForm extends Component {
     const { user_name, password } = ev.target
 
     console.log('login form submitted')
-    console.log({ username:user_name.value, password:password.value })
-    ts.saveAuthToken(btoa(user_name.value + ':' + password.value));
-    //localStorage.setItem('thingful-client-auth-token', btoa('dunder-mifflin:password'));
+    let options = {
+      method:'POST',
+      headers: new Headers({'Content-type': 'application/json'}),
+      body: JSON.stringify({user_name:user_name.value,password:password.value})
+    };
+    fetch(endpoint + '/login',options)
+      .then(res=>{
+          if(res.ok)
+            return res.json();
+          else
+            throw new Error('invalid credentials');
+      }).then(token=>
+        {
+          ts.saveAuthToken(token.token)
+          user_name.value = ''
+          password.value = ''
+          this.props.onLoginSuccess()
+        })
 
-    user_name.value = ''
-    password.value = ''
-    this.props.onLoginSuccess()
+    
   }
 
   render() {

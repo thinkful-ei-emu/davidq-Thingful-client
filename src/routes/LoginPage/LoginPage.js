@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import LoginForm from '../../components/LoginForm/LoginForm'
 import { Section } from '../../components/Utils/Utils'
+import LoginError from '../../components/LoginForm/LoginError';
 
 export default class LoginPage extends Component {
   static defaultProps = {
@@ -20,9 +21,11 @@ export default class LoginPage extends Component {
     return (
       <Section className='LoginPage'>
         <h2>Login</h2>
+        <LoginError>
         <LoginForm
           onLoginSuccess={this.handleLoginSuccess}
         />
+        </LoginError>
       </Section>
     )
   }
