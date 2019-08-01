@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Button, Input, Required } from '../Utils/Utils'
+import { Button, Input, Required } from '../Utils/Utils';
+import rgSev from '../../services/registration.service';
 
 export default class RegistrationForm extends Component {
   static defaultProps = {
@@ -10,16 +11,35 @@ export default class RegistrationForm extends Component {
 
   handleSubmit = ev => {
     ev.preventDefault()
+    this.setState({error:null});
     const { full_name, nick_name, user_name, password } = ev.target
+    console.log( full_name.value, nick_name.value, user_name.value, password.value )
+    //console.log('valid inputs: ',rgSev.validateForm(full_name.value,nick_name.value,user_name.value,password.value))
+    try{
+    rgSev.validateForm(full_name.value,nick_name.value,user_name.value,password.value)
+      rgSev.RegisterUser(user_name.value,full_name.value,password.value,nick_name.value)
+              .then((res)=>{
+                console.log('registration form submitted')
+                full_name.value = ''
+                nick_name.value = ''
+                user_name.value = ''
+                password.value = ''
+                this.props.onRegistrationSuccess()
+              }).catch(err=>this.setState({error:'The server encontered an error: ' +err.message}));
 
-    console.log('registration form submitted')
-    console.log({ full_name, nick_name, user_name, password })
+      
+    }
+    catch(err)
+    {
+      this.setState({error:err.message});
+    }
+    finally{
+      password.value = '';
+    }
+      
+    
 
-    full_name.value = ''
-    nick_name.value = ''
-    user_name.value = ''
-    password.value = ''
-    this.props.onRegistrationSuccess()
+    
   }
 
   render() {
